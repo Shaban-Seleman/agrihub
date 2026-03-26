@@ -1,0 +1,6 @@
+app:
+  auth:
+    cookie-secure: true
+logging:
+  level:
+    root: INFO

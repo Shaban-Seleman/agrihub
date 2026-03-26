@@ -1,0 +1,15 @@
+{
+  "common": {
+    "appName": "SamiAgriHub",
+    "tagline": "An agriculture platform connecting learning, markets and opportunities."
+  },
+  "auth": {
+    "loginTitle": "Sign in to your account",
+    "registerTitle": "Create your SamiAgriHub account",
+    "verifyTitle": "Verify OTP",
+    "accountTypeTitle": "Choose your account type"
+  },
+  "dashboard": {
+    "title": "Action hub"
+  }
+}

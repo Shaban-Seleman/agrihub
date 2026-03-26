@@ -1,0 +1,15 @@
+{
+  "common": {
+    "appName": "SamiAgriHub",
+    "tagline": "Jukwaa la kilimo linalounganisha maarifa, masoko na fursa."
+  },
+  "auth": {
+    "loginTitle": "Ingia kwenye akaunti yako",
+    "registerTitle": "Fungua akaunti ya SamiAgriHub",
+    "verifyTitle": "Thibitisha OTP",
+    "accountTypeTitle": "Chagua aina ya akaunti"
+  },
+  "dashboard": {
+    "title": "Kituo cha hatua"
+  }
+}

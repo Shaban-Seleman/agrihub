@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: samiagrihub-backend
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/samiagrihub}
+    username: ${DB_USERNAME:samiagrihub}
+    password: ${DB_PASSWORD:samiagrihub}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+  flyway:
+    enabled: true
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+server:
+  servlet:
+    context-path: /
+app:
+  auth:
+    jwt-secret: ${APP_JWT_SECRET:change-me-change-me-change-me-change-me}
+    access-token-minutes: ${APP_ACCESS_TOKEN_MINUTES:120}
+    cookie-name: ${APP_AUTH_COOKIE_NAME:samiagrihub_session}
+    cookie-secure: ${APP_AUTH_COOKIE_SECURE:false}
+  otp:
+    ttl-minutes: ${APP_OTP_TTL_MINUTES:10}
+    resend-cooldown-seconds: ${APP_OTP_RESEND_COOLDOWN_SECONDS:60}
+  cors:
+    allowed-origin-patterns: ${APP_CORS_ALLOWED_ORIGIN_PATTERNS:http://localhost:3000,http://127.0.0.1:3000}
+  seed:
+    enabled: ${APP_SEED_ENABLED:false}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+logging:
+  pattern:
+    level: "%5p [%X{traceId:-}]"

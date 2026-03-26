@@ -1,0 +1,10 @@
+{
+  "name": "SamiAgriHub",
+  "short_name": "SamiAgriHub",
+  "start_url": "/sw",
+  "display": "standalone",
+  "background_color": "#fbf8ef",
+  "theme_color": "#2f6b3b",
+  "lang": "sw",
+  "description": "Inclusive agriculture platform for learning, tracking, market linkage and opportunities."
+}
