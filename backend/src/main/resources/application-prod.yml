@@ -1,6 +1,13 @@
 app:
   auth:
     cookie-secure: true
+    cookie-same-site: Lax
+  otp:
+    provider: ${APP_OTP_PROVIDER:http}
+    enabled: ${APP_OTP_ENABLED:true}
+  email:
+    provider: ${APP_EMAIL_PROVIDER:http}
+    enabled: ${APP_EMAIL_ENABLED:true}
 logging:
   level:
     root: INFO

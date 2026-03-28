@@ -3,9 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { completeLesson, saveLessonFeedback } from '@/api/learning-client';
-import { Badge } from '@/components/ui/badge';
+import { DetailSection, StatusPill } from '@/components/app/primitives';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils/cn';
 
@@ -31,13 +30,11 @@ export function LessonActions({
   const [saving, setSaving] = useState(false);
 
   return (
-    <Card className="space-y-5">
+    <DetailSection title="Lesson actions" subtitle="Move through the course in order and leave internal feedback to improve future curriculum quality." className="h-fit">
       <div className="space-y-2">
-        <Badge className={completed ? 'bg-leaf/15 text-leaf' : ''}>{completed ? 'Completed' : 'Ready to study'}</Badge>
-        <h2 className="text-xl font-semibold">Lesson actions</h2>
-        <p className="text-sm text-ink/70">Move through the course in order and leave feedback to improve future learning content.</p>
+        <StatusPill tone={completed ? 'green' : 'gold'}>{completed ? 'Completed' : 'Ready to study'}</StatusPill>
       </div>
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      {error ? <p className="rounded-[1.25rem] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
       <div className="grid gap-3 sm:grid-cols-3">
         <Button
           variant="ghost"
@@ -74,7 +71,7 @@ export function LessonActions({
       </div>
       <div className="space-y-3 rounded-[1.4rem] bg-cream p-4">
         <div>
-          <h3 className="font-semibold">Was this lesson helpful?</h3>
+          <h3 className="font-headline text-2xl font-bold text-ink">Was this lesson helpful?</h3>
           <p className="mt-1 text-sm text-ink/70">Your response is internal and helps the team improve the curriculum.</p>
         </div>
         <div className="flex gap-3">
@@ -128,6 +125,6 @@ export function LessonActions({
           Save Feedback
         </Button>
       </div>
-    </Card>
+    </DetailSection>
   );
 }

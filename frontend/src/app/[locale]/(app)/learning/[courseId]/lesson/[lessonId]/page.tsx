@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { getCourse, getLesson, getLessonFeedback } from '@/api/learning';
-import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
+import { DetailSection, MediaPanel, StatusPill } from '@/components/app/primitives';
 import { EmptyState } from '@/components/states/empty-state';
 import { LessonActions } from '@/features/learning/lesson-actions';
 import { formatNumber } from '@/lib/presentation';
@@ -33,7 +32,7 @@ export default async function LessonPage({
       || lesson.mediaUrl.endsWith('.mp4'));
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-8">
       <nav className="flex flex-wrap items-center gap-2 text-sm text-ink/60">
         <Link href={`/${locale}/learning`} className="hover:text-leaf">AgriLearn</Link>
         <span>/</span>
@@ -44,29 +43,21 @@ export default async function LessonPage({
 
       <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
         <div className="space-y-4">
-          <Card className="space-y-5">
-            <div className="flex flex-wrap items-center gap-3">
-              <Badge>Lesson detail</Badge>
-              <Badge>{module?.title ?? 'Course module'}</Badge>
-              <Badge className={lesson.completed ? 'bg-leaf/15 text-leaf' : ''}>{lesson.completed ? 'Completed' : 'In progress'}</Badge>
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold">{lesson.title}</h1>
-              <p className="mt-3 text-sm text-ink/70">{module?.title ?? 'Course module'} · Approx. {formatNumber(lesson.durationMinutes ?? 0)} minutes</p>
-            </div>
-            <div className="rounded-[1.4rem] bg-cream p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ink/50">Lesson summary</p>
-              <p className="mt-3 text-sm leading-7 text-ink/80">{summary}</p>
-            </div>
-          </Card>
-
-          <Card className="space-y-4">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <h2 className="text-xl font-semibold">Video section</h2>
-                <p className="mt-1 text-sm text-ink/70">Watch or open the lesson media if it is provided for this module.</p>
+          <MediaPanel
+            title={lesson.title}
+            subtitle={summary}
+            badge={
+              <div className="flex flex-wrap gap-2">
+                <StatusPill tone="gold">Lesson detail</StatusPill>
+                <StatusPill tone="muted">{module?.title ?? 'Course module'}</StatusPill>
+                <StatusPill tone={lesson.completed ? 'green' : 'gold'}>{lesson.completed ? 'Completed' : 'In progress'}</StatusPill>
               </div>
-            </div>
+            }
+          >
+            <p className="text-sm text-white/80">{module?.title ?? 'Course module'} · Approx. {formatNumber(lesson.durationMinutes ?? 0)} minutes</p>
+          </MediaPanel>
+
+          <DetailSection title="Video section" subtitle="Watch or open the lesson media if it is provided for this module.">
             {lesson.mediaUrl ? (
               isEmbeddable ? (
                 lesson.mediaUrl.endsWith('.mp4') ? (
@@ -91,14 +82,13 @@ export default async function LessonPage({
             ) : (
               <EmptyState title="No video attached" description="This lesson is text-first. Continue with the reading below and use the feedback block after completion." />
             )}
-          </Card>
+          </DetailSection>
 
-          <Card className="space-y-4">
-            <h2 className="text-xl font-semibold">Lesson notes</h2>
+          <DetailSection title="Lesson notes" subtitle="Readable lesson content for study in low-friction, mobile-first format.">
             <div className="rounded-[1.4rem] bg-white">
               <div className="whitespace-pre-wrap text-sm leading-8 text-black/80">{lesson.content}</div>
             </div>
-          </Card>
+          </DetailSection>
         </div>
 
         <LessonActions

@@ -6,9 +6,12 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { getSession, login, register, resendOtp, verifyOtp } from '@/api/auth';
+import { FormField } from '@/components/app/forms';
+import { StatusPill } from '@/components/app/primitives';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
 import { getRoleHomePath } from '@/lib/auth/navigation';
 
 const OTP_RESEND_COOLDOWN_SECONDS = 60;
@@ -31,18 +34,24 @@ const verifySchema = z.object({
   otpCode: z.string().length(6)
 });
 
-export function RegisterForm({ locale }: { locale: string }) {
+export function RegisterForm({
+  locale,
+  defaultAccountType = 'FARMER_YOUTH'
+}: {
+  locale: string;
+  defaultAccountType?: 'FARMER_YOUTH' | 'AGRI_SME' | 'PARTNER';
+}) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { accountType: 'FARMER_YOUTH' }
+    defaultValues: { accountType: defaultAccountType }
   });
 
   return (
-    <Card>
+    <Card className="rounded-[2rem] p-6 md:p-7">
       <form
-        className="space-y-4"
+        className="space-y-5"
         onSubmit={form.handleSubmit(async (values) => {
           try {
             setError(null);
@@ -53,16 +62,29 @@ export function RegisterForm({ locale }: { locale: string }) {
           }
         })}
       >
-        {error ? <p className="text-sm text-red-600">{error}</p> : null}
-        <Input placeholder="Jina kamili" {...form.register('fullName')} />
-        <Input placeholder="Namba ya simu" {...form.register('phoneNumber')} />
-        <Input type="password" placeholder="Nenosiri" {...form.register('password')} />
-        <select className="min-h-11 w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-sm" {...form.register('accountType')}>
-          <option value="FARMER_YOUTH">Farmer / Youth</option>
-          <option value="AGRI_SME">Agri SME</option>
-          <option value="PARTNER">Partner</option>
-        </select>
-        <Button className="w-full" type="submit">Endelea</Button>
+        <div className="space-y-2">
+          <StatusPill tone="gold">Create account</StatusPill>
+          <h2 className="font-headline text-3xl font-bold text-ink">Join the hub</h2>
+          <p className="text-sm leading-6 text-muted">Create your account securely, verify your phone number, and continue into role-based onboarding.</p>
+        </div>
+        {error ? <p className="rounded-[1.25rem] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
+        <FormField label="Full name">
+          <Input placeholder="Jina kamili" {...form.register('fullName')} />
+        </FormField>
+        <FormField label="Phone number">
+          <Input placeholder="Namba ya simu" {...form.register('phoneNumber')} />
+        </FormField>
+        <FormField label="Password">
+          <Input type="password" placeholder="Nenosiri" {...form.register('password')} />
+        </FormField>
+        <FormField label="Account type">
+          <Select {...form.register('accountType')}>
+            <option value="FARMER_YOUTH">Farmer / Youth</option>
+            <option value="AGRI_SME">Agri-SME</option>
+            <option value="PARTNER">Partner / Institution</option>
+          </Select>
+        </FormField>
+        <Button className="w-full" type="submit">Continue to OTP</Button>
       </form>
     </Card>
   );
@@ -74,9 +96,9 @@ export function LoginForm({ locale }: { locale: string }) {
   const form = useForm<z.infer<typeof loginSchema>>({ resolver: zodResolver(loginSchema) });
 
   return (
-    <Card>
+    <Card className="rounded-[2rem] p-6 md:p-7">
       <form
-        className="space-y-4"
+        className="space-y-5"
         onSubmit={form.handleSubmit(async (values) => {
           try {
             setError(null);
@@ -89,10 +111,19 @@ export function LoginForm({ locale }: { locale: string }) {
           }
         })}
       >
-        {error ? <p className="text-sm text-red-600">{error}</p> : null}
-        <Input placeholder="Namba ya simu" {...form.register('phoneNumber')} />
-        <Input type="password" placeholder="Nenosiri" {...form.register('password')} />
-        <Button className="w-full" type="submit">Ingia</Button>
+        <div className="space-y-2">
+          <StatusPill tone="green">Secure sign in</StatusPill>
+          <h2 className="font-headline text-3xl font-bold text-ink">Welcome back</h2>
+          <p className="text-sm leading-6 text-muted">Sign in with your registered phone number and password to continue where you left off.</p>
+        </div>
+        {error ? <p className="rounded-[1.25rem] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
+        <FormField label="Phone number">
+          <Input placeholder="Namba ya simu" {...form.register('phoneNumber')} />
+        </FormField>
+        <FormField label="Password">
+          <Input type="password" placeholder="Nenosiri" {...form.register('password')} />
+        </FormField>
+        <Button className="w-full" type="submit">Sign in</Button>
       </form>
     </Card>
   );
@@ -121,9 +152,9 @@ export function VerifyOtpForm({ locale, phoneNumber }: { locale: string; phoneNu
   }, [cooldownRemaining]);
 
   return (
-    <Card>
+    <Card className="rounded-[2rem] p-6 md:p-7">
       <form
-        className="space-y-4"
+        className="space-y-5"
         onSubmit={form.handleSubmit(async (values) => {
           try {
             setError(null);
@@ -134,11 +165,20 @@ export function VerifyOtpForm({ locale, phoneNumber }: { locale: string; phoneNu
           }
         })}
       >
-        {error ? <p className="text-sm text-red-600">{error}</p> : null}
-        <Input placeholder="Namba ya simu" {...form.register('phoneNumber')} />
-        <Input placeholder="OTP ya tarakimu 6" {...form.register('otpCode')} />
+        <div className="space-y-2">
+          <StatusPill tone="gold">OTP verification</StatusPill>
+          <h2 className="font-headline text-3xl font-bold text-ink">Confirm your phone number</h2>
+          <p className="text-sm leading-6 text-muted">Enter the 6-digit code sent to your phone. OTP resend remains rate-limited for security.</p>
+        </div>
+        {error ? <p className="rounded-[1.25rem] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
+        <FormField label="Phone number">
+          <Input placeholder="Namba ya simu" {...form.register('phoneNumber')} />
+        </FormField>
+        <FormField label="OTP code">
+          <Input placeholder="OTP ya tarakimu 6" {...form.register('otpCode')} />
+        </FormField>
         <div className="flex gap-3">
-          <Button className="flex-1" type="submit">Thibitisha</Button>
+          <Button className="flex-1" type="submit">Verify</Button>
           <Button
             className="flex-1 disabled:cursor-not-allowed disabled:opacity-60"
             disabled={isResending || cooldownRemaining > 0}
@@ -164,12 +204,12 @@ export function VerifyOtpForm({ locale, phoneNumber }: { locale: string; phoneNu
               }
             }}
           >
-            {isResending ? 'Inatuma...' : cooldownRemaining > 0 ? `Subiri ${cooldownRemaining}s` : 'Tuma tena'}
+            {isResending ? 'Sending...' : cooldownRemaining > 0 ? `Wait ${cooldownRemaining}s` : 'Resend'}
           </Button>
         </div>
         {cooldownRemaining > 0 ? (
-          <p className="text-sm text-black/60">
-            OTP mpya inaweza kutumwa baada ya sekunde {cooldownRemaining}.
+          <p className="text-sm text-muted">
+            A new OTP can be requested after {cooldownRemaining} seconds.
           </p>
         ) : null}
       </form>

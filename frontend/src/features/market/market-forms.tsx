@@ -5,8 +5,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { fetchMyActivities } from '@/api/farming-client';
 import { fetchCrops, fetchDistricts, fetchRegions, type MetadataOption } from '@/api/metadata-client';
 import { createDemand, createProduce, updateDemand, updateProduce } from '@/api/market-client';
+import { FieldGroup, FormField } from '@/components/app/forms';
+import { DetailSection, StatusPill } from '@/components/app/primitives';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
@@ -104,17 +105,20 @@ function ListingForm({ kind, locale, listingId, initialValues }: CommonProps & {
   }
 
   return (
-    <Card className="space-y-5">
-      <div className="space-y-2">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-leaf">{kind === 'produce' ? 'Supply listing' : 'Buyer demand'}</p>
-        <h1 className="text-2xl font-bold">{listingId ? 'Update listing' : `Create ${kind} listing`}</h1>
-        <p className="text-sm text-ink/70">Use structured market fields so filtering, moderation, and expiry rules work reliably.</p>
-      </div>
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
-      <div className="grid gap-4 md:grid-cols-2">
+    <div className="space-y-6">
+      <DetailSection
+        title={listingId ? `Update ${kind} listing` : `Create ${kind} listing`}
+        subtitle="Use structured market fields so filtering, moderation, expiry, and contact workflows remain reliable."
+      >
+        <div className="space-y-5">
+          <div className="flex flex-wrap gap-2">
+            <StatusPill tone={kind === 'produce' ? 'green' : 'gold'}>{kind === 'produce' ? 'Supply listing' : 'Buyer demand'}</StatusPill>
+            {listingId ? <StatusPill tone="muted">Edit mode</StatusPill> : null}
+          </div>
+          {error ? <p className="rounded-[1.25rem] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
+          <FieldGroup>
         {kind === 'produce' ? (
-          <label className="space-y-2 text-sm font-medium md:col-span-2">
-            <span>Related farming activity</span>
+          <FormField label="Related farming activity" className="md:col-span-2">
             <Select value={form.farmingActivityId} onChange={(e) => setForm({ ...form, farmingActivityId: e.target.value })}>
               <option value="">Optional: link to your activity</option>
               {filteredActivities.map((activity) => (
@@ -123,66 +127,57 @@ function ListingForm({ kind, locale, listingId, initialValues }: CommonProps & {
                 </option>
               ))}
             </Select>
-          </label>
+          </FormField>
         ) : null}
-        <label className="space-y-2 text-sm font-medium">
-          <span>Crop</span>
+        <FormField label="Crop">
           <Select value={form.cropId} onChange={(e) => setForm({ ...form, cropId: e.target.value })}>
             <option value="">Select crop</option>
             {crops.map((crop) => <option key={crop.id} value={crop.id}>{crop.name}</option>)}
           </Select>
-        </label>
-        <label className="space-y-2 text-sm font-medium">
-          <span>Unit</span>
+        </FormField>
+        <FormField label="Unit">
           <Select value={form.unit} onChange={(e) => setForm({ ...form, unit: e.target.value })}>
             <option value="">Select unit</option>
             {UNITS.map((unit) => <option key={unit} value={unit}>{unit}</option>)}
           </Select>
-        </label>
-        <label className="space-y-2 text-sm font-medium md:col-span-2">
-          <span>Title</span>
+        </FormField>
+        <FormField label="Title" className="md:col-span-2">
           <Input placeholder="Example: Fresh maize available in Chamwino" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
-        </label>
-        <label className="space-y-2 text-sm font-medium md:col-span-2">
-          <span>Description</span>
+        </FormField>
+        <FormField label="Description" className="md:col-span-2">
           <Textarea placeholder="State grade, packaging, collection terms, and timing" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-        </label>
-        <label className="space-y-2 text-sm font-medium">
-          <span>Quantity</span>
+        </FormField>
+        <FormField label="Quantity">
           <Input placeholder="100" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} />
-        </label>
-        <label className="space-y-2 text-sm font-medium">
-          <span>{kind === 'produce' ? 'Price per unit' : 'Offered price per unit'}</span>
+        </FormField>
+        <FormField label={kind === 'produce' ? 'Price per unit' : 'Offered price per unit'}>
           <Input placeholder="Optional" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
-        </label>
-        <label className="space-y-2 text-sm font-medium">
-          <span>Region</span>
+        </FormField>
+        <FormField label="Region">
           <Select value={form.regionId} onChange={(e) => setForm({ ...form, regionId: e.target.value, districtId: '' })}>
             <option value="">Select region</option>
             {regions.map((region) => <option key={region.id} value={region.id}>{region.name}</option>)}
           </Select>
-        </label>
-        <label className="space-y-2 text-sm font-medium">
-          <span>District</span>
+        </FormField>
+        <FormField label="District">
           <Select value={form.districtId} onChange={(e) => setForm({ ...form, districtId: e.target.value })} disabled={!form.regionId}>
             <option value="">Select district</option>
             {districts.map((district) => <option key={district.id} value={district.id}>{district.name}</option>)}
           </Select>
-        </label>
-        <label className="space-y-2 text-sm font-medium">
-          <span>Contact name</span>
+        </FormField>
+        <FormField label="Contact name">
           <Input placeholder="Optional" value={form.contactName} onChange={(e) => setForm({ ...form, contactName: e.target.value })} />
-        </label>
-        <label className="space-y-2 text-sm font-medium">
-          <span>Contact phone</span>
+        </FormField>
+        <FormField label="Contact phone">
           <Input placeholder="+2557..." value={form.contactPhone} onChange={(e) => setForm({ ...form, contactPhone: e.target.value })} />
-        </label>
-        <label className="space-y-2 text-sm font-medium md:col-span-2">
-          <span>Expiry date and time</span>
+        </FormField>
+        <FormField label="Expiry date and time" className="md:col-span-2">
           <Input type="datetime-local" value={form.expiresAt} onChange={(e) => setForm({ ...form, expiresAt: e.target.value })} />
-        </label>
-      </div>
-      <Button className="w-full" onClick={submit}>{listingId ? 'Update Listing' : 'Create Listing'}</Button>
-    </Card>
+        </FormField>
+          </FieldGroup>
+          <Button className="w-full md:w-auto" onClick={submit}>{listingId ? 'Update listing' : 'Create listing'}</Button>
+        </div>
+      </DetailSection>
+    </div>
   );
 }

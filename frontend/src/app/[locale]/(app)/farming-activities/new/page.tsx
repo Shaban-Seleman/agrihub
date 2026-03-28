@@ -1,6 +1,6 @@
-import { FarmingForm } from '@/features/farming/farming-form';
+import { ActivityWizard } from '@/features/farming/activity-wizard';
 
 export default async function NewFarmingActivityPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  return <FarmingForm locale={locale} mode="create" />;
+  return <ActivityWizard locale={locale} mode="create" />;
 }

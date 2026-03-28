@@ -7,6 +7,7 @@ public record JwtProperties(
         String jwtSecret,
         long accessTokenMinutes,
         String cookieName,
-        boolean cookieSecure
+        boolean cookieSecure,
+        String cookieSameSite
 ) {
 }

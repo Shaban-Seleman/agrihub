@@ -1,5 +1,6 @@
 package com.samiagrihub;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import jakarta.servlet.http.Cookie;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -36,6 +38,7 @@ class BackendIntegrationTest {
     void registerVerifyLoginAndFetchMe() throws Exception {
         String phone = "+255700123456";
         mockMvc.perform(post("/api/v1/auth/register")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -53,6 +56,7 @@ class BackendIntegrationTest {
         OtpChallenge challenge = otpChallengeRepository.findTopByUserOrderByCreatedAtDesc(user).orElseThrow();
 
         mockMvc.perform(post("/api/v1/auth/verify-otp")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -64,6 +68,7 @@ class BackendIntegrationTest {
                 .andExpect(jsonPath("$.data.status").value("ACTIVE"));
 
         MvcResult loginResult = mockMvc.perform(post("/api/v1/auth/login")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -86,6 +91,7 @@ class BackendIntegrationTest {
     void completeFarmerOnboarding() throws Exception {
         String phone = "+255700654321";
         mockMvc.perform(post("/api/v1/auth/register")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -100,6 +106,7 @@ class BackendIntegrationTest {
         User user = userRepository.findByPhoneNumber(phone).orElseThrow();
         OtpChallenge challenge = otpChallengeRepository.findTopByUserOrderByCreatedAtDesc(user).orElseThrow();
         mockMvc.perform(post("/api/v1/auth/verify-otp")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -110,6 +117,7 @@ class BackendIntegrationTest {
                 .andExpect(status().isOk());
 
         MvcResult loginResult = mockMvc.perform(post("/api/v1/auth/login")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -137,6 +145,7 @@ class BackendIntegrationTest {
         var authCookie = loginResult.getResponse().getCookie("samiagrihub_session");
 
         mockMvc.perform(put("/api/v1/me/profile")
+                        .with(csrf())
                         .cookie(authCookie)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -151,6 +160,7 @@ class BackendIntegrationTest {
                 .andExpect(status().isOk());
 
         mockMvc.perform(put("/api/v1/me/farmer-profile")
+                        .with(csrf())
                         .cookie(authCookie)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -165,6 +175,7 @@ class BackendIntegrationTest {
                 .andExpect(status().isOk());
 
         mockMvc.perform(post("/api/v1/me/crop-interests")
+                        .with(csrf())
                         .cookie(authCookie)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -177,5 +188,130 @@ class BackendIntegrationTest {
         mockMvc.perform(get("/api/v1/me/profile-completion").cookie(authCookie))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.percentage").value(100));
+    }
+
+    @Test
+    void changePasswordAndLogout() throws Exception {
+        String phone = "+255700999111";
+        mockMvc.perform(post("/api/v1/auth/register")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "phoneNumber": "%s",
+                                  "password": "Password123",
+                                  "accountType": "FARMER_YOUTH",
+                                  "fullName": "Mariam Kweka"
+                                }
+                                """.formatted(phone)))
+                .andExpect(status().isOk());
+
+        User user = userRepository.findByPhoneNumber(phone).orElseThrow();
+        OtpChallenge challenge = otpChallengeRepository.findTopByUserOrderByCreatedAtDesc(user).orElseThrow();
+        mockMvc.perform(post("/api/v1/auth/verify-otp")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "phoneNumber": "%s",
+                                  "otpCode": "%s"
+                                }
+                                """.formatted(phone, challenge.getOtpCode())))
+                .andExpect(status().isOk());
+
+        MvcResult loginResult = mockMvc.perform(post("/api/v1/auth/login")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "phoneNumber": "%s",
+                                  "password": "Password123"
+                                }
+                                """.formatted(phone)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        var authCookie = loginResult.getResponse().getCookie("samiagrihub_session");
+
+        mockMvc.perform(post("/api/v1/me/password")
+                        .with(csrf())
+                        .cookie(authCookie)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "currentPassword": "Password123",
+                                  "newPassword": "NewPassword456",
+                                  "confirmNewPassword": "NewPassword456"
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.changed").value(true));
+
+        mockMvc.perform(post("/api/v1/auth/logout").with(csrf()).cookie(authCookie))
+                .andExpect(status().isOk())
+                .andExpect(cookie().maxAge("samiagrihub_session", 0));
+
+        mockMvc.perform(post("/api/v1/auth/login")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "phoneNumber": "%s",
+                                  "password": "Password123"
+                                }
+                                """.formatted(phone)))
+                .andExpect(status().isUnauthorized());
+
+        mockMvc.perform(post("/api/v1/auth/login")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "phoneNumber": "%s",
+                                  "password": "NewPassword456"
+                                }
+                                """.formatted(phone)))
+                .andExpect(status().isOk())
+                .andExpect(cookie().exists("samiagrihub_session"));
+    }
+
+    @Test
+    void unsafeRequestsWithoutCsrfAreRejected() throws Exception {
+        mockMvc.perform(post("/api/v1/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "phoneNumber": "+255711111111",
+                                  "password": "Password123",
+                                  "accountType": "FARMER_YOUTH",
+                                  "fullName": "No Csrf User"
+                                }
+                                """))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void browserStyleCsrfCookieCanAuthorizeUnsafeRequest() throws Exception {
+        MvcResult csrfResult = mockMvc.perform(get("/api/v1/auth/csrf"))
+                .andExpect(status().isOk())
+                .andExpect(cookie().exists("XSRF-TOKEN"))
+                .andReturn();
+
+        Cookie csrfCookie = csrfResult.getResponse().getCookie("XSRF-TOKEN");
+
+        mockMvc.perform(post("/api/v1/auth/register")
+                        .cookie(csrfCookie)
+                        .header("X-XSRF-TOKEN", csrfCookie.getValue())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "phoneNumber": "+255722222222",
+                                  "password": "Password123",
+                                  "accountType": "FARMER_YOUTH",
+                                  "fullName": "Cookie Csrf User"
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
     }
 }

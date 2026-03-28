@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { getActivity } from '@/api/farming';
-import { Badge } from '@/components/ui/badge';
+import { HeroPanel } from '@/components/app/layout';
+import { DetailRow, DetailSection, MediaPanel, StatusPill } from '@/components/app/primitives';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { formatDate } from '@/lib/presentation';
 
 export default async function FarmingActivityDetailPage({
@@ -14,28 +14,31 @@ export default async function FarmingActivityDetailPage({
   const activity = await getActivity(activityId);
 
   return (
-    <div className="space-y-4">
-      <Card className="space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h1 className="text-3xl font-bold">{activity.cropName}</h1>
-            <p className="mt-2 text-sm text-ink/70">{activity.seasonCode}</p>
-          </div>
-          <Badge>{activity.status}</Badge>
-        </div>
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-2xl bg-cream p-4"><p className="text-sm text-ink/60">Planting date</p><p className="mt-2 font-semibold">{formatDate(activity.plantingDate)}</p></div>
-          <div className="rounded-2xl bg-cream p-4"><p className="text-sm text-ink/60">Harvest date</p><p className="mt-2 font-semibold">{formatDate(activity.harvestDate)}</p></div>
-          <div className="rounded-2xl bg-cream p-4"><p className="text-sm text-ink/60">Land use</p><p className="mt-2 font-semibold">{activity.landSize} {activity.landUnit}</p></div>
-          <div className="rounded-2xl bg-cream p-4"><p className="text-sm text-ink/60">Yield</p><p className="mt-2 font-semibold">{activity.actualYield ?? 'Not set'} {activity.yieldUnit ?? ''}</p></div>
-        </div>
-        <div className="rounded-2xl border border-black/10 p-4">
-          <p className="text-sm font-semibold">Method and notes</p>
-          <p className="mt-2 text-sm text-ink/75">{activity.farmingMethod}</p>
-          <p className="mt-3 text-sm text-ink/70">{activity.notes || 'No notes recorded yet.'}</p>
-        </div>
-        <Link href={`/${locale}/farming-activities/${activityId}/edit`}><Button>Edit Activity</Button></Link>
-      </Card>
+    <div className="space-y-8">
+      <MediaPanel
+        title={`${activity.cropName} - ${activity.seasonCode}`}
+        subtitle="A complete view of the season record, from planting details through harvest updates and field notes."
+        imageUrl="https://lh3.googleusercontent.com/aida-public/AB6AXuDQqJe_571HAC031veK96_TiS5ZVydSoYho7Qv0aWbBKDtxrNuokuGzDMCf8il7A_njijHyQ1-E5WLu4hn0L32kStXn2b5g1bfo4Y-cnhni4prZXl9_ZJUkakHnkMZEMmLOgnv3Y5Purq54Sd53hc7I1wot8059EERgdUgn8vyEP814GcRoEvzssQRCCOD8jEOUtvyBVCIcHmvWfO1DyAIP14daI7umbaCmWZikCDKyP9j6FBJ6o5s1bysC9iSIAcgoO-Hf0_arzVM"
+        badge={<StatusPill tone={activity.status === 'HARVESTED' ? 'gold' : 'green'}>{activity.status}</StatusPill>}
+      >
+        <Link href={`/${locale}/farming-activities/${activityId}/edit`}>
+          <Button variant="secondary">Edit details</Button>
+        </Link>
+      </MediaPanel>
+
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <HeroPanel eyebrow="Planting date" title={formatDate(activity.plantingDate)} accent={null} />
+        <HeroPanel eyebrow="Harvest date" title={formatDate(activity.harvestDate)} accent={null} />
+        <HeroPanel eyebrow="Land use" title={`${activity.landSize} ${activity.landUnit}`} accent={null} />
+        <HeroPanel eyebrow="Yield" title={`${activity.actualYield ?? 'Not set'} ${activity.yieldUnit ?? ''}`.trim()} accent={null} />
+      </div>
+
+      <DetailSection title="Field record" subtitle="These details are used for progress tracking, reporting, and future season planning.">
+        <DetailRow label="Season code" value={activity.seasonCode} icon="calendar_today" />
+        <DetailRow label="Farming method" value={activity.farmingMethod} icon="eco" />
+        <DetailRow label="Status" value={activity.status} icon="check_circle" />
+        <DetailRow label="Recorded notes" value={activity.notes || 'No notes recorded yet.'} icon="note_stack" />
+      </DetailSection>
     </div>
   );
 }

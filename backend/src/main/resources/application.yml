@@ -26,9 +26,29 @@ app:
     access-token-minutes: ${APP_ACCESS_TOKEN_MINUTES:120}
     cookie-name: ${APP_AUTH_COOKIE_NAME:samiagrihub_session}
     cookie-secure: ${APP_AUTH_COOKIE_SECURE:false}
+    cookie-same-site: ${APP_AUTH_COOKIE_SAME_SITE:Lax}
   otp:
+    provider: ${APP_OTP_PROVIDER:}
+    enabled: ${APP_OTP_ENABLED:false}
+    base-url: ${APP_OTP_BASE_URL:}
+    delivery-path: ${APP_OTP_DELIVERY_PATH:/messages/otp}
+    auth-token: ${APP_OTP_AUTH_TOKEN:}
+    auth-header-name: ${APP_OTP_AUTH_HEADER_NAME:Authorization}
+    sender-id: ${APP_OTP_SENDER_ID:}
+    timeout-millis: ${APP_OTP_TIMEOUT_MILLIS:5000}
     ttl-minutes: ${APP_OTP_TTL_MINUTES:10}
     resend-cooldown-seconds: ${APP_OTP_RESEND_COOLDOWN_SECONDS:60}
+  email:
+    provider: ${APP_EMAIL_PROVIDER:}
+    enabled: ${APP_EMAIL_ENABLED:false}
+    base-url: ${APP_EMAIL_BASE_URL:}
+    delivery-path: ${APP_EMAIL_DELIVERY_PATH:/messages/email}
+    auth-token: ${APP_EMAIL_AUTH_TOKEN:}
+    auth-header-name: ${APP_EMAIL_AUTH_HEADER_NAME:Authorization}
+    from-address: ${APP_EMAIL_FROM_ADDRESS:}
+    from-name: ${APP_EMAIL_FROM_NAME:}
+    reply-to: ${APP_EMAIL_REPLY_TO:}
+    timeout-millis: ${APP_EMAIL_TIMEOUT_MILLIS:5000}
   cors:
     allowed-origin-patterns: ${APP_CORS_ALLOWED_ORIGIN_PATTERNS:http://localhost:3000,http://127.0.0.1:3000}
   seed:

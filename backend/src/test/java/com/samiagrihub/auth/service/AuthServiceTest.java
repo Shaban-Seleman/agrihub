@@ -45,7 +45,7 @@ class AuthServiceTest {
                 otpChallengeRepository,
                 passwordEncoder,
                 otpService,
-                new OtpProperties(10, 60),
+                new OtpProperties("logging", false, "", "", "", "Authorization", "", 5000, 10, 60),
                 rateLimitService,
                 jwtTokenService,
                 auditService
@@ -64,7 +64,7 @@ class AuthServiceTest {
                 otpChallengeRepository,
                 passwordEncoder,
                 otpService,
-                new OtpProperties(10, 60),
+                new OtpProperties("logging", false, "", "", "", "Authorization", "", 5000, 10, 60),
                 rateLimitService,
                 jwtTokenService,
                 auditService

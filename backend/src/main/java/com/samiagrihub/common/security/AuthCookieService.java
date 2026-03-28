@@ -18,7 +18,7 @@ public class AuthCookieService {
         ResponseCookie cookie = ResponseCookie.from(jwtProperties.cookieName(), token)
                 .httpOnly(true)
                 .secure(jwtProperties.cookieSecure())
-                .sameSite("Lax")
+                .sameSite(jwtProperties.cookieSameSite())
                 .path("/")
                 .maxAge(jwtProperties.accessTokenMinutes() * 60)
                 .build();
@@ -29,7 +29,7 @@ public class AuthCookieService {
         ResponseCookie cookie = ResponseCookie.from(jwtProperties.cookieName(), "")
                 .httpOnly(true)
                 .secure(jwtProperties.cookieSecure())
-                .sameSite("Lax")
+                .sameSite(jwtProperties.cookieSameSite())
                 .path("/")
                 .maxAge(0)
                 .build();

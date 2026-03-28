@@ -13,5 +13,15 @@ app:
   auth:
     jwt-secret: test-secret-test-secret-test-secret
     cookie-secure: false
+  otp:
+    provider: logging
+    enabled: false
+    auth-header-name: Authorization
+    timeout-millis: 5000
+  email:
+    provider: logging
+    enabled: false
+    auth-header-name: Authorization
+    timeout-millis: 5000
   seed:
     enabled: false

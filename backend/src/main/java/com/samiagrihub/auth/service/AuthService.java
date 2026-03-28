@@ -127,6 +127,10 @@ public class AuthService {
                 .build());
     }
 
+    public void logout(AppUserPrincipal principal) {
+        auditService.log(principal.getUserId(), AuditAction.LOGOUT, "USER", String.valueOf(principal.getUserId()), null);
+    }
+
     private void issueOtp(User user) {
         String code = "%06d".formatted(secureRandom.nextInt(1_000_000));
         otpChallengeRepository.save(OtpChallenge.builder()

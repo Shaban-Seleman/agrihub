@@ -4,6 +4,7 @@ import com.samiagrihub.common.api.ApiResponse;
 import com.samiagrihub.common.security.AppUserPrincipal;
 import com.samiagrihub.common.security.SecurityContextService;
 import com.samiagrihub.user.dto.CropSelectionRequest;
+import com.samiagrihub.user.dto.ChangePasswordRequest;
 import com.samiagrihub.user.dto.UpdateBusinessProfileRequest;
 import com.samiagrihub.user.dto.UpdateFarmerProfileRequest;
 import com.samiagrihub.user.dto.UpdatePartnerProfileRequest;
@@ -89,5 +90,11 @@ public class MeController {
     @GetMapping("/profile-completion")
     public ApiResponse<?> getProfileCompletion() {
         return ApiResponse.success(userService.getProfileCompletion(securityContextService.currentUser()));
+    }
+
+    @PostMapping("/password")
+    public ApiResponse<?> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
+        userService.changePassword(securityContextService.currentUser(), request);
+        return ApiResponse.success(java.util.Map.of("changed", true));
     }
 }

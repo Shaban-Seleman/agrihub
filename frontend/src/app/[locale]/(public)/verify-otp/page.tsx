@@ -1,5 +1,5 @@
-import { getTranslations } from 'next-intl/server';
 import { PublicShell } from '@/components/layout/public-shell';
+import { PublicSection } from '@/components/layout/public-shell';
 import { VerifyOtpForm } from '@/features/auth/auth-form';
 
 export default async function VerifyOtpPage({
@@ -11,13 +11,13 @@ export default async function VerifyOtpPage({
 }) {
   const { locale } = await params;
   const { phone } = await searchParams;
-  const t = await getTranslations('auth');
 
   return (
-    <PublicShell locale={locale}>
-      <div className="mx-auto max-w-md py-10">
-        <h1 className="mb-4 text-3xl font-bold">{t('verifyTitle')}</h1>
+    <PublicShell locale={locale} compact>
+      <div className="py-6">
+        <PublicSection title="Verify your OTP" subtitle="Confirm your phone number to activate your account and continue into SamiAgriHub onboarding.">
         <VerifyOtpForm locale={locale} phoneNumber={phone} />
+        </PublicSection>
       </div>
     </PublicShell>
   );

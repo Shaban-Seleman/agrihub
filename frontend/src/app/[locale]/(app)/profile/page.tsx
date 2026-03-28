@@ -1,23 +1,46 @@
-import { getProfileBundle, getProfileCompletion } from '@/api/profile';
-import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
-import { ProgressBar } from '@/components/ui/progress-bar';
+import { getBusinessCommodities, getCropInterests, getProfileBundle, getProfileCompletion } from '@/api/profile';
+import { HeroPanel, SectionHeader } from '@/components/app/layout';
+import { StatCard } from '@/components/app/cards';
+import { AccountSecuritySection } from '@/features/auth/account-security';
 import { ProfileForms } from '@/features/profile/profile-form';
+import { getFriendlyRoleLabel, getPreferredDisplayName } from '@/lib/auth/navigation';
+import { requireSession } from '@/lib/auth/session';
 
 export default async function ProfilePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  const [profileBundle, completion] = await Promise.all([getProfileBundle(), getProfileCompletion()]);
+  const session = await requireSession();
+  const [profileBundle, completion, cropInterests, businessCommodities] = await Promise.all([
+    getProfileBundle(),
+    getProfileCompletion(),
+    session.accountType === 'FARMER_YOUTH' ? getCropInterests() : Promise.resolve([]),
+    session.accountType === 'AGRI_SME' ? getBusinessCommodities() : Promise.resolve([])
+  ]);
+  const displayName = getPreferredDisplayName(session, profileBundle);
+  const roleLabel = getFriendlyRoleLabel(session.accountType);
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <Badge>Profile completion</Badge>
-        <h1 className="mt-2 text-3xl font-bold">Profile</h1>
-        <p className="mt-3 text-sm text-ink/70">Keep location and crop details current so advisory, directory, and inclusion reporting stay accurate.</p>
-        <ProgressBar className="mt-4" value={Number(completion.percentage ?? 0)} />
-        <p className="mt-2 text-sm font-medium">{completion.percentage ?? 0}% complete</p>
-      </Card>
-      <ProfileForms locale={locale} profileBundle={profileBundle} />
+    <div className="space-y-8">
+      <HeroPanel
+        eyebrow="Profile"
+        title={displayName}
+        subtitle={`Maintain accurate ${roleLabel} details so advisory, matching, directory visibility, and inclusion reporting stay reliable.`}
+        accent={<StatCard label="Completion" value={`${completion.percentage ?? 0}%`} hint="Shared profile, role profile, and crop selections all contribute." icon="task_alt" />}
+      />
+      <div className="grid gap-4 md:grid-cols-3">
+        <StatCard label="Shared profile" value={completion.sharedProfileComplete ? 'Complete' : 'Pending'} hint="Name and location details." icon="person" />
+        <StatCard label="Role profile" value={completion.roleProfileComplete ? 'Complete' : 'Pending'} hint="Farmer, SME, or partner role details." icon="badge" />
+        <StatCard label="Selections" value={completion.cropSelectionsComplete ? 'Complete' : 'Pending'} hint="Crop interests or business commodities." icon="eco" tone="gold" />
+      </div>
+      <SectionHeader eyebrow="Editable sections" title="Profile details" subtitle="All editable profile sections reuse the same metadata-driven and mobile-first form system." />
+      <ProfileForms
+        locale={locale}
+        profileBundle={profileBundle}
+        accountType={session.accountType}
+        cropSelections={cropInterests}
+        commoditySelections={businessCommodities}
+      />
+      <SectionHeader eyebrow="Account settings" title="Security" subtitle="Manage the credentials and session controls available in the current MVP." />
+      <AccountSecuritySection locale={locale} roleLabel={roleLabel} />
     </div>
   );
 }

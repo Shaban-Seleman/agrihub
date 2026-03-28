@@ -3,6 +3,8 @@ package com.samiagrihub.common.audit;
 public enum AuditAction {
     LOGIN_SUCCESS,
     LOGIN_FAILED,
+    LOGOUT,
+    PASSWORD_CHANGED,
     USER_REGISTERED,
     OTP_VERIFIED,
     COURSE_PUBLISHED,

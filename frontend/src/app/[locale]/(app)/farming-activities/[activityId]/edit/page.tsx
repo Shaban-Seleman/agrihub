@@ -1,5 +1,5 @@
 import { getActivity } from '@/api/farming';
-import { FarmingForm } from '@/features/farming/farming-form';
+import { ActivityWizard } from '@/features/farming/activity-wizard';
 
 export default async function EditFarmingActivityPage({
   params
@@ -8,5 +8,5 @@ export default async function EditFarmingActivityPage({
 }) {
   const { locale, activityId } = await params;
   const activity = await getActivity(activityId);
-  return <FarmingForm locale={locale} mode="edit" activityId={activityId} initialValues={activity} />;
+  return <ActivityWizard locale={locale} mode="edit" activityId={activityId} initialValues={activity} />;
 }

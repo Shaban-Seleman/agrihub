@@ -1,8 +1,11 @@
 package com.samiagrihub.user.service;
 
+import com.samiagrihub.common.audit.AuditAction;
+import com.samiagrihub.common.audit.AuditService;
 import com.samiagrihub.common.exception.AppException;
 import com.samiagrihub.common.security.AppUserPrincipal;
 import com.samiagrihub.user.dto.BusinessProfileDto;
+import com.samiagrihub.user.dto.ChangePasswordRequest;
 import com.samiagrihub.user.dto.CropOptionDto;
 import com.samiagrihub.user.dto.CropSelectionRequest;
 import com.samiagrihub.user.dto.FarmerProfileDto;
@@ -38,6 +41,7 @@ import com.samiagrihub.user.repository.WardRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +62,8 @@ public class UserService {
     private final UserCropInterestRepository userCropInterestRepository;
     private final BusinessProfileCommodityRepository businessProfileCommodityRepository;
     private final UserProfileMapper userProfileMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final AuditService auditService;
 
     public MeResponse getMe(AppUserPrincipal principal) {
         User user = currentUser(principal);
@@ -236,6 +242,24 @@ public class UserService {
         };
         int completed = (sharedProfileComplete ? 1 : 0) + (roleProfileComplete ? 1 : 0) + (cropSelectionsComplete ? 1 : 0);
         return new ProfileCompletionResponse(completed * 100 / 3, sharedProfileComplete, roleProfileComplete, cropSelectionsComplete);
+    }
+
+    @Transactional
+    public void changePassword(AppUserPrincipal principal, ChangePasswordRequest request) {
+        User user = currentUser(principal);
+        if (!passwordEncoder.matches(request.currentPassword(), user.getPasswordHash())) {
+            throw new AppException("INVALID_CURRENT_PASSWORD", "Current password is incorrect", HttpStatus.BAD_REQUEST);
+        }
+        if (!request.newPassword().equals(request.confirmNewPassword())) {
+            throw new AppException("PASSWORD_CONFIRMATION_MISMATCH", "New password confirmation does not match", HttpStatus.BAD_REQUEST);
+        }
+        if (request.currentPassword().equals(request.newPassword())) {
+            throw new AppException("PASSWORD_UNCHANGED", "New password must be different from the current password", HttpStatus.BAD_REQUEST);
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
+        auditService.log(user.getId(), AuditAction.PASSWORD_CHANGED, "USER", String.valueOf(user.getId()), null);
     }
 
     private User currentUser(AppUserPrincipal principal) {

@@ -1,15 +1,24 @@
 import { cookies } from 'next/headers';
 import { env } from '@/lib/env';
+import { getCsrfHeaderName, isUnsafeMethod } from '@/lib/security/csrf';
 import type { ApiResponse } from '@/types/api';
 
 export async function serverApiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const cookieHeader = (await cookies()).toString();
+  const cookieStore = await cookies();
+  const cookieHeader = cookieStore.toString();
+  const headers = new Headers(init.headers ?? {});
+  headers.set('Cookie', cookieHeader);
+
+  if (isUnsafeMethod(init.method)) {
+    const csrfToken = cookieStore.get('XSRF-TOKEN')?.value;
+    if (csrfToken) {
+      headers.set(getCsrfHeaderName(), csrfToken);
+    }
+  }
+
   const response = await fetch(`${env.apiBaseUrl}${path}`, {
     ...init,
-    headers: {
-      Cookie: cookieHeader,
-      ...(init.headers ?? {})
-    },
+    headers,
     cache: 'no-store'
   });
 

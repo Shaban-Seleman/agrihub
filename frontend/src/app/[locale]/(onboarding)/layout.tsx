@@ -11,7 +11,7 @@ export default async function OnboardingLayout({
   const { locale } = await params;
   try {
     await requireSession(['FARMER_YOUTH', 'AGRI_SME', 'PARTNER']);
-    return children;
+    return <div className="min-h-screen bg-cream px-4 py-10 sm:px-6">{children}</div>;
   } catch {
     redirect(`/${locale}/login`);
   }

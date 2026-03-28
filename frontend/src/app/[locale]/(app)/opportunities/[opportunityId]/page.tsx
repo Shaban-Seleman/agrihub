@@ -1,12 +1,48 @@
 import Link from 'next/link';
 import { getOpportunity } from '@/api/opportunities';
-import { Badge } from '@/components/ui/badge';
+import { DetailRow, DetailSection, MediaPanel, StatusPill } from '@/components/app/primitives';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { formatDateTime, formatEnumLabel } from '@/lib/presentation';
 
 export default async function OpportunityDetailPage({ params }: { params: Promise<{ locale: string; opportunityId: string }> }) {
   const { locale, opportunityId } = await params;
   const opportunity = await getOpportunity(opportunityId);
-  return <Card className="space-y-4"><div className="flex flex-wrap items-center justify-between gap-3"><div><h1 className="text-3xl font-bold">{opportunity.title}</h1><p className="mt-2 text-sm text-ink/70">{formatEnumLabel(opportunity.opportunityType)}</p></div><Badge>{opportunity.status}</Badge></div><div className="grid gap-4 md:grid-cols-2"><div className="rounded-2xl bg-cream p-4"><p className="text-sm text-ink/60">Deadline</p><p className="mt-2 font-semibold">{formatDateTime(opportunity.deadline)}</p></div><div className="rounded-2xl bg-cream p-4"><p className="text-sm text-ink/60">Target geography</p><p className="mt-2 font-semibold">{opportunity.regionName || 'Not specified'}</p></div></div><div className="rounded-2xl border border-black/10 p-4"><p className="text-sm font-semibold">Summary</p><p className="mt-2 text-sm text-ink/75">{opportunity.summary}</p></div><div className="grid gap-3 md:grid-cols-2"><div className="rounded-2xl border border-black/10 p-4"><p className="text-sm font-semibold">External application</p><p className="mt-2 text-sm text-ink/75">{opportunity.externalApplicationLink || 'Not provided'}</p></div><div className="rounded-2xl border border-black/10 p-4"><p className="text-sm font-semibold">Contact details</p><p className="mt-2 text-sm text-ink/75">{opportunity.contactDetails || 'Not provided'}</p></div></div><Link href={`/${locale}/opportunities/${opportunityId}/edit`}><Button className="mt-2">Edit Opportunity</Button></Link></Card>;
+  return (
+    <div className="space-y-8">
+      <MediaPanel
+        title={opportunity.title}
+        subtitle={opportunity.summary}
+        imageUrl="https://lh3.googleusercontent.com/aida-public/AB6AXuCbxKfleTU4CukZqfhvKYWeKMlOY21OXqyy5UfllzgJ1Cy9BMTQDtRAstLCq5BgWlvQpQEt947TQvd3fGYanNSWggWR2ZXFZLOvwfW0xokpz7REEV0VRbiM0zQbGwqjcKWSZ-hdpNAdX8K7w52FX-K8TtwgQVUhIgO00ttT7WW-D3-Cu5qeothpgJpu-X-tR-TZQwON5lRNBb7UKIdOqMRQdHUxwRjFg9HPeUxe4aNbXtje_sYhIlX_xE1z-wKNhzy5702M7DBvDqY"
+        badge={<StatusPill tone="gold">{opportunity.status}</StatusPill>}
+      >
+        <div className="flex flex-wrap gap-3">
+          <StatusPill tone="green">{formatEnumLabel(opportunity.opportunityType)}</StatusPill>
+          <StatusPill tone="muted">{formatDateTime(opportunity.deadline)}</StatusPill>
+        </div>
+      </MediaPanel>
+
+      <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
+        <DetailSection title="Program overview" subtitle="A clean summary of the opportunity scope and its application path.">
+          <p className="text-base leading-8 text-muted">{opportunity.summary}</p>
+        </DetailSection>
+
+        <DetailSection title="Key details">
+          <DetailRow label="Opportunity type" value={formatEnumLabel(opportunity.opportunityType)} icon="category" />
+          <DetailRow label="Deadline" value={formatDateTime(opportunity.deadline)} icon="calendar_month" />
+          <DetailRow label="Geography" value={opportunity.regionName || 'Not specified'} icon="location_on" />
+        </DetailSection>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <DetailSection title="External application" subtitle="Application remains external in this MVP.">
+          <p className="text-sm leading-7 text-muted">{opportunity.externalApplicationLink || 'Not provided'}</p>
+        </DetailSection>
+        <DetailSection title="Contact details" subtitle="Use contact details when no external application link is provided.">
+          <p className="text-sm leading-7 text-muted">{opportunity.contactDetails || 'Not provided'}</p>
+        </DetailSection>
+      </div>
+
+      <Link href={`/${locale}/opportunities/${opportunityId}/edit`}><Button>Edit opportunity</Button></Link>
+    </div>
+  );
 }

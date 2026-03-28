@@ -1,9 +1,26 @@
 import { getAdvisory } from '@/api/advisory';
-import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
+import { DetailSection, StatusPill } from '@/components/app/primitives';
+import { HeroPanel } from '@/components/app/layout';
 
-export default async function AdvisoryDetailPage({ params }: { params: Promise<{ advisoryId: string }> }) {
+export default async function AdvisoryDetailPage({ params }: { params: Promise<{ locale: string; advisoryId: string }> }) {
   const { advisoryId } = await params;
   const item = await getAdvisory(advisoryId);
-  return <Card className="space-y-4"><div className="flex flex-wrap items-center gap-3"><Badge>{item.status}</Badge>{item.cropName ? <Badge>{item.cropName}</Badge> : null}</div><h1 className="text-3xl font-bold">{item.title}</h1><p className="text-sm text-ink/70">{item.summary}</p><div className="rounded-[1.4rem] bg-cream p-5"><div className="whitespace-pre-wrap text-sm leading-8 text-black/80">{item.content}</div></div></Card>;
+  return (
+    <div className="space-y-8">
+      <HeroPanel
+        eyebrow="Advisory detail"
+        title={item.title}
+        subtitle={item.summary}
+        accent={
+          <div className="flex flex-wrap gap-2">
+            <StatusPill tone="gold">{item.status}</StatusPill>
+            {item.cropName ? <StatusPill tone="green">{item.cropName}</StatusPill> : null}
+          </div>
+        }
+      />
+      <DetailSection title="Guidance body" subtitle="Readable advisory content in a mobile-first content block.">
+        <div className="whitespace-pre-wrap text-sm leading-8 text-black/80">{item.content}</div>
+      </DetailSection>
+    </div>
+  );
 }

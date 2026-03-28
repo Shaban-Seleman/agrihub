@@ -50,6 +50,12 @@ export async function login(payload: LoginPayload) {
   });
 }
 
+export async function logout() {
+  return apiFetch('/api/v1/auth/logout', {
+    method: 'POST'
+  });
+}
+
 export async function getSession() {
   return apiFetch<SessionUser>('/api/v1/me');
 }
