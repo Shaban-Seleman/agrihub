@@ -11,8 +11,10 @@ export const listMyDemand = () => serverApiFetch<any>('/api/v1/me/demand-listing
 
 export const createProduce = (payload: unknown) => apiFetch('/api/v1/produce-listings', { method: 'POST', body: JSON.stringify(payload) });
 export const updateProduce = (id: string, payload: unknown) => apiFetch(`/api/v1/produce-listings/${id}`, { method: 'PUT', body: JSON.stringify(payload) });
+export const deactivateProduce = (id: string | number) => apiFetch(`/api/v1/produce-listings/${id}/deactivate`, { method: 'PATCH' });
 export const createDemand = (payload: unknown) => apiFetch('/api/v1/demand-listings', { method: 'POST', body: JSON.stringify(payload) });
 export const updateDemand = (id: string, payload: unknown) => apiFetch(`/api/v1/demand-listings/${id}`, { method: 'PUT', body: JSON.stringify(payload) });
+export const deactivateDemand = (id: string | number) => apiFetch(`/api/v1/demand-listings/${id}/deactivate`, { method: 'PATCH' });
 
 export const adminProduceListings = () => serverApiFetch<any>('/api/v1/admin/produce-listings?page=0&size=20');
 export const adminDemandListings = () => serverApiFetch<any>('/api/v1/admin/demand-listings?page=0&size=20');

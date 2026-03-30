@@ -34,6 +34,8 @@ public class AdminLearningController {
     public ApiResponse<?> updateLesson(@PathVariable Long lessonId, @Valid @RequestBody LessonRequest request) { return ApiResponse.success(learningService.saveLesson(null, request, lessonId, securityContextService.currentUser())); }
     @GetMapping("/courses")
     public ApiResponse<?> courses(Pageable pageable) { return ApiResponse.success(learningService.listCourses(pageable, true)); }
+    @GetMapping("/courses/{courseId}")
+    public ApiResponse<?> course(@PathVariable Long courseId) { return ApiResponse.success(learningService.getCourse(courseId, true, null)); }
     @PatchMapping("/courses/{courseId}/archive")
     public ApiResponse<?> archiveCourse(@PathVariable Long courseId) { return ApiResponse.success(learningService.archiveCourse(courseId, securityContextService.currentUser())); }
     @GetMapping("/lessons/{lessonId}/feedback-summary")

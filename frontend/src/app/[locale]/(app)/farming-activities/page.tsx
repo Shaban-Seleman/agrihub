@@ -5,6 +5,7 @@ import { ActivityCard, StatCard } from '@/components/app/cards';
 import { HeroPanel, SectionHeader } from '@/components/app/layout';
 import { Icon, StatusPill } from '@/components/app/primitives';
 import { Button } from '@/components/ui/button';
+import { DeleteActivityAction } from '@/features/farming/activity-actions';
 import { canAccessFarming, getRoleHomePath } from '@/lib/auth/navigation';
 import { requireSession } from '@/lib/auth/session';
 import { formatDate, formatNumber } from '@/lib/presentation';
@@ -71,6 +72,14 @@ export default async function FarmingActivitiesPage({ params }: { params: Promis
                 activity.farmingMethod
               ]}
               accent={<Icon name="eco" className="text-[26px] text-leaf" filled />}
+              footer={
+                <div className="flex flex-wrap gap-3">
+                  <Link href={`/${locale}/farming-activities/${activity.id}`}>
+                    <Button variant="soft">View details</Button>
+                  </Link>
+                  <DeleteActivityAction activityId={activity.id} />
+                </div>
+              }
             />
           ))}
         </div>

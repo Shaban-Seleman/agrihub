@@ -42,6 +42,13 @@ const adminRoutes = [
     meta: 'Opportunity review'
   },
   {
+    slug: 'farming',
+    title: 'Farming',
+    description: 'Review submitted production records that power reporting and seasonal analytics.',
+    icon: 'agriculture',
+    meta: 'Production oversight'
+  },
+  {
     slug: 'analytics',
     title: 'Analytics',
     description: 'Review aggregated program signals for oversight and donor-safe reporting.',

@@ -124,7 +124,8 @@ export function ActivityCard({
   badge,
   subtitle,
   meta,
-  accent
+  accent,
+  footer
 }: {
   href: string;
   title: string;
@@ -132,10 +133,11 @@ export function ActivityCard({
   subtitle: string;
   meta: Array<string>;
   accent?: ReactNode;
+  footer?: ReactNode;
 }) {
   return (
-    <Link href={href}>
-      <Card className="h-full overflow-hidden">
+    <Card className="h-full overflow-hidden">
+      <Link href={href}>
         <div className="flex items-start justify-between gap-4">
           <div>
             <div className="mb-4">{badge}</div>
@@ -151,8 +153,9 @@ export function ActivityCard({
             </div>
           ))}
         </div>
-      </Card>
-    </Link>
+      </Link>
+      {footer ? <div className="mt-5 border-t border-line/20 pt-5">{footer}</div> : null}
+    </Card>
   );
 }
 

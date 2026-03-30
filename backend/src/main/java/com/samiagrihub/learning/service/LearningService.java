@@ -65,7 +65,7 @@ public class LearningService {
                 .map(module -> {
                     List<Map<String, Object>> lessons = lessonRepository.findByModuleIdOrderByDisplayOrderAsc(module.getId()).stream()
                             .filter(lesson -> adminView || lesson.getStatus() == ContentStatus.PUBLISHED)
-                            .map(lesson -> toLessonSummary(lesson, userId))
+                            .map(lesson -> adminView ? toAdminLessonSummary(lesson) : toLessonSummary(lesson, userId))
                             .toList();
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("id", module.getId());
@@ -272,6 +272,18 @@ public class LearningService {
         map.put("durationMinutes", lesson.getDurationMinutes());
         map.put("displayOrder", lesson.getDisplayOrder());
         map.put("completed", completed);
+        return map;
+    }
+
+    private Map<String, Object> toAdminLessonSummary(Lesson lesson) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("id", lesson.getId());
+        map.put("title", lesson.getTitle());
+        map.put("content", lesson.getContent());
+        map.put("mediaUrl", lesson.getMediaUrl());
+        map.put("durationMinutes", lesson.getDurationMinutes());
+        map.put("displayOrder", lesson.getDisplayOrder());
+        map.put("status", lesson.getStatus().name());
         return map;
     }
 

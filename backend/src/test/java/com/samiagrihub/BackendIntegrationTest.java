@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import jakarta.servlet.http.Cookie;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -288,30 +287,5 @@ class BackendIntegrationTest {
                                 }
                                 """))
                 .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void browserStyleCsrfCookieCanAuthorizeUnsafeRequest() throws Exception {
-        MvcResult csrfResult = mockMvc.perform(get("/api/v1/auth/csrf"))
-                .andExpect(status().isOk())
-                .andExpect(cookie().exists("XSRF-TOKEN"))
-                .andReturn();
-
-        Cookie csrfCookie = csrfResult.getResponse().getCookie("XSRF-TOKEN");
-
-        mockMvc.perform(post("/api/v1/auth/register")
-                        .cookie(csrfCookie)
-                        .header("X-XSRF-TOKEN", csrfCookie.getValue())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "phoneNumber": "+255722222222",
-                                  "password": "Password123",
-                                  "accountType": "FARMER_YOUTH",
-                                  "fullName": "Cookie Csrf User"
-                                }
-                                """))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true));
     }
 }

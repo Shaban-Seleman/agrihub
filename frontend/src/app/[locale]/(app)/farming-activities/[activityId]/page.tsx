@@ -3,6 +3,7 @@ import { getActivity } from '@/api/farming';
 import { HeroPanel } from '@/components/app/layout';
 import { DetailRow, DetailSection, MediaPanel, StatusPill } from '@/components/app/primitives';
 import { Button } from '@/components/ui/button';
+import { DeleteActivityAction } from '@/features/farming/activity-actions';
 import { formatDate } from '@/lib/presentation';
 
 export default async function FarmingActivityDetailPage({
@@ -21,9 +22,12 @@ export default async function FarmingActivityDetailPage({
         imageUrl="https://lh3.googleusercontent.com/aida-public/AB6AXuDQqJe_571HAC031veK96_TiS5ZVydSoYho7Qv0aWbBKDtxrNuokuGzDMCf8il7A_njijHyQ1-E5WLu4hn0L32kStXn2b5g1bfo4Y-cnhni4prZXl9_ZJUkakHnkMZEMmLOgnv3Y5Purq54Sd53hc7I1wot8059EERgdUgn8vyEP814GcRoEvzssQRCCOD8jEOUtvyBVCIcHmvWfO1DyAIP14daI7umbaCmWZikCDKyP9j6FBJ6o5s1bysC9iSIAcgoO-Hf0_arzVM"
         badge={<StatusPill tone={activity.status === 'HARVESTED' ? 'gold' : 'green'}>{activity.status}</StatusPill>}
       >
-        <Link href={`/${locale}/farming-activities/${activityId}/edit`}>
-          <Button variant="secondary">Edit details</Button>
-        </Link>
+        <div className="flex flex-wrap gap-3">
+          <Link href={`/${locale}/farming-activities/${activityId}/edit`}>
+            <Button variant="secondary">Edit details</Button>
+          </Link>
+          <DeleteActivityAction activityId={activityId} redirectTo={`/${locale}/farming-activities`} />
+        </div>
       </MediaPanel>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">

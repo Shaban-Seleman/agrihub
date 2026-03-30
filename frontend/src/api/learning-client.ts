@@ -8,5 +8,27 @@ export const saveCourse = (courseId: string | number | null, payload: unknown) =
     method: courseId ? 'PUT' : 'POST',
     body: JSON.stringify(payload)
   });
+export const saveCourseModule = (courseId: string | number, payload: unknown) =>
+  apiFetch(`/api/v1/admin/courses/${courseId}/modules`, {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+export const updateCourseModule = (moduleId: string | number, payload: unknown) =>
+  apiFetch(`/api/v1/admin/course-modules/${moduleId}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload)
+  });
+export const saveLesson = (moduleId: string | number, payload: unknown) =>
+  apiFetch(`/api/v1/admin/modules/${moduleId}/lessons`, {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+export const updateLesson = (lessonId: string | number, payload: unknown) =>
+  apiFetch(`/api/v1/admin/lessons/${lessonId}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload)
+  });
+export const fetchLessonFeedbackSummary = (lessonId: string | number) =>
+  apiFetch(`/api/v1/admin/lessons/${lessonId}/feedback-summary`);
 export const archiveCourse = (courseId: string | number) =>
   apiFetch(`/api/v1/admin/courses/${courseId}/archive`, { method: 'PATCH' });

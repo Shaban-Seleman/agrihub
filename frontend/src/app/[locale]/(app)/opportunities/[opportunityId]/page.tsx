@@ -1,12 +1,20 @@
 import Link from 'next/link';
-import { getOpportunity } from '@/api/opportunities';
+import { getOpportunity, listMyOpportunities } from '@/api/opportunities';
 import { DetailRow, DetailSection, MediaPanel, StatusPill } from '@/components/app/primitives';
 import { Button } from '@/components/ui/button';
+import { DeactivateOpportunityAction } from '@/features/opportunities/opportunity-actions';
+import { requireSession } from '@/lib/auth/session';
 import { formatDateTime, formatEnumLabel } from '@/lib/presentation';
 
 export default async function OpportunityDetailPage({ params }: { params: Promise<{ locale: string; opportunityId: string }> }) {
   const { locale, opportunityId } = await params;
+  const session = await requireSession();
   const opportunity = await getOpportunity(opportunityId);
+  const canOwnOpportunities = ['AGRI_SME', 'PARTNER', 'ADMIN'].includes(session.accountType);
+  const ownedOpportunityIds = canOwnOpportunities
+    ? new Set(((await listMyOpportunities()).items ?? []).map((item: any) => String(item.id)))
+    : new Set<string>();
+  const isOwned = ownedOpportunityIds.has(String(opportunity.id));
   return (
     <div className="space-y-8">
       <MediaPanel
@@ -42,7 +50,12 @@ export default async function OpportunityDetailPage({ params }: { params: Promis
         </DetailSection>
       </div>
 
-      <Link href={`/${locale}/opportunities/${opportunityId}/edit`}><Button>Edit opportunity</Button></Link>
+      {isOwned ? (
+        <div className="flex flex-wrap gap-3">
+          <Link href={`/${locale}/opportunities/${opportunityId}/edit`}><Button>Edit opportunity</Button></Link>
+          <DeactivateOpportunityAction opportunityId={opportunityId} redirectTo={`/${locale}/opportunities`} />
+        </div>
+      ) : null}
     </div>
   );
 }

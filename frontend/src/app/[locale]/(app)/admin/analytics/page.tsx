@@ -2,6 +2,7 @@ import { getDashboardInclusion, getDashboardMarket, getDashboardOverview, getDas
 import { BreakdownList, CompactMetricCard, InsightProgress } from '@/components/app/governance';
 import { HeroPanel, SectionHeader } from '@/components/app/layout';
 import { DetailSection, StatusPill } from '@/components/app/primitives';
+import { AnalyticsExportActions } from '@/features/admin/analytics-export-actions';
 import { entriesOf, formatNumber } from '@/lib/presentation';
 
 export default async function AdminAnalyticsPage() {
@@ -33,7 +34,12 @@ export default async function AdminAnalyticsPage() {
           </>
         }
         subtitle="These views are aggregated for oversight and moderation. They support operational decision-making without exposing donor-facing raw personal data."
-        accent={<StatusPill tone="gold">Aggregated only</StatusPill>}
+        accent={
+          <div className="space-y-3">
+            <StatusPill tone="gold">Aggregated only</StatusPill>
+            <AnalyticsExportActions />
+          </div>
+        }
       />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">

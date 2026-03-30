@@ -14,8 +14,3 @@ export const getDonorProduction = getDashboardProduction;
 export const getDonorMarket = getDashboardMarket;
 export const getDonorOpportunities = getDashboardOpportunities;
 export const getDonorSmes = getDashboardSmes;
-
-export async function fetchCsv(path: string) {
-  const response = await fetch(path, { credentials: 'include' });
-  return response.text();
-}

@@ -8,3 +8,6 @@ export const getCourseProgress = () => serverApiFetch<any>('/api/v1/me/course-pr
 export const getLearningHome = () => serverApiFetch<any>('/api/v1/me/learning-home');
 
 export const adminListCourses = () => serverApiFetch<any>('/api/v1/admin/courses?page=0&size=20');
+export const getAdminCourse = (courseId: string | number) => serverApiFetch<any>(`/api/v1/admin/courses/${courseId}`);
+export const getAdminLessonFeedbackSummary = (lessonId: string | number) =>
+  serverApiFetch<any>(`/api/v1/admin/lessons/${lessonId}/feedback-summary`);

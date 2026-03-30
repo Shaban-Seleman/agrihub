@@ -4,3 +4,4 @@ export const fetchMyActivities = () => apiFetch<any>('/api/v1/me/farming-activit
 export const createActivity = (payload: unknown) => apiFetch('/api/v1/farming-activities', { method: 'POST', body: JSON.stringify(payload) });
 export const updateActivity = (activityId: string, payload: unknown) =>
   apiFetch(`/api/v1/farming-activities/${activityId}`, { method: 'PUT', body: JSON.stringify(payload) });
+export const deleteActivity = (activityId: string) => apiFetch(`/api/v1/farming-activities/${activityId}`, { method: 'DELETE' });
