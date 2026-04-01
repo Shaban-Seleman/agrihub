@@ -1,0 +1,10 @@
+.gradle
+build
+docs
+.git
+.gitignore
+.DS_Store
+*.log
+*.tmp
+.env
+.env.*
